@@ -1,5 +1,7 @@
 import { type FastifyReply, type FastifyRequest } from "fastify";
 import bcrypt from "bcrypt";
+import { findByEmail, create } from "../../Repositories/UserRepository";
+
 
 export async function updateInsert(
   type: string,
@@ -14,8 +16,19 @@ export async function updateInsert(
     return reply.status(400).send({ message: "Invalid Type" });
   }
 
+  const user = await findByEmail(userEmail, request);
+  if (!user) {
+    return reply.status(404).send({ message: "User not found" });
+  }
+
+  let hashedPassword = changedData;
+  if (type === "password") {
+    const salt: number = 10;
+    hashedPassword = await bcrypt.hash(changedData, salt);
+  }
+
   const query: string = `UPDATE users SET ${type} = $1 WHERE email = $2`;
-  await request.server.pg.query(query, [changedData, userEmail]);
+  await request.server.pg.query(query, [hashedPassword, userEmail]);
 }
 
 export async function createUser(
@@ -27,16 +40,13 @@ export async function createUser(
   const salt: number = 10;
   const hashedPassword: string = await bcrypt.hash(password, salt);
 
-  const query: string = `INSERT INTO users
-    (email, password, role) VALUES ($1,$2,$3)
-    RETURNING id, email, role, created_at`;
-
-  const result = await request.server.pg.query(query, [
+  const result = await create({
     email,
-    hashedPassword,
-    role,
-  ]);
-  return result;
+    password: hashedPassword,
+    role
+  }, request);
+  
+  return { rows: [result] };
 }
 
 export async function deleteAccount(

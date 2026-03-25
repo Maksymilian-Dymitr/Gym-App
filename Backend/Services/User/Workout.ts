@@ -1,17 +1,16 @@
-import { type FastifyReply, type FastifyRequest } from "fastify";
-import { db } from "../../DB/mongo";
-import { type Sets, type WorkoutCatalog } from "Backend/Types/gym";
-import type { InsertOneResult } from "mongodb";
+import { type FastifyReply } from "fastify";
+import { type WorkoutCatalog } from "../../Types/gym";
+import { getAllWorkoutsByUserId, createWorkout, deleteWorkout, updateWorkout } from "../../Repositories/WorkoutRepository";
+
 
 export async function getAllWorkoutSerivce(
   reply: FastifyReply,
   user_id: number,
 ) {
-  const collection = await db.collection("workout_catalog");
-  const result = await collection.find({ user_id: user_id }).toArray();
+  const result = await getAllWorkoutsByUserId(user_id);
 
   if (result.length === 0) {
-    return reply.status(404).send({ message: "No Workout Found" });
+    return reply.status(404).send({ error: "No workouts found" });
   }
 
   return result;
@@ -21,10 +20,9 @@ export async function createWorkoutService(
   reply: FastifyReply,
   user_id: number,
   title: string,
-  exercise_list: Sets[],
+  exercise_list: any[],
   total_workout_volume: number,
 ) {
-  const collection = await db.collection("workout_catalog");
   if (!title || title.trim() === "") {
     reply.status(400).send({ error: "Title is required" });
     throw new Error("Title is required")
@@ -45,9 +43,9 @@ export async function createWorkoutService(
     exercise_list,
     total_workout_volume,
   };
-  const result = await collection.insertOne(<WorkoutCatalog>newWorkout);
-
-  return [result, newWorkout] as [InsertOneResult<Document>, WorkoutCatalog];
+  
+  const result = await createWorkout(newWorkout);
+  return result;
 }
 
 export async function deleteWorkoutService(
@@ -55,19 +53,14 @@ export async function deleteWorkoutService(
   user_id: number,
   title: string,
 ) {
-  
-  const collection = await db.collection("workout_catalog");
-
   if (!title || title === "")
     return reply.status(401).send({ error: "Workout title is required" });
 
-  const result = await collection.deleteMany({
-    id: user_id,
-    title: title,
-  });
-  if (result.deletedCount === 0)
+  const result = await deleteWorkout(user_id, title);
+  if (!result)
     return reply.status(404).send({ error: "Workout not found" });
 }
+
 export async function updateWorkoutService(
   reply: FastifyReply,
   user_id: number,
@@ -75,16 +68,9 @@ export async function updateWorkoutService(
   typeOfChange: string ,
   changedData: string | number,
   ) {
-  
-  const collection = await db.collection("workout_catalog");
-   const result = await collection.updateOne(
-     { user_id: user_id, title: title },
-     {
-       $set: { [typeOfChange]: changedData },
-     },
-   );
+  const result = await updateWorkout(user_id, title, typeOfChange, changedData);
  
-   if (result.matchedCount === 0) {
-     reply.status(404).send({ message: "No Workout Found" });
-   }
+  if (!result) {
+    reply.status(404).send({ message: "No Workout Found" });
+  }
 }

@@ -1,7 +1,8 @@
 import { type FastifyReply, type FastifyRequest } from "fastify";
-import { db } from "../../../DB/mongo";
-import { type Sets, type WorkoutCatalog } from "Backend/Types/gym";
+import { type Sets } from "../../../Types/gym";
 import * as workoutService from "../../../Services/User/Workout";
+import { getWorkoutByUserIdAndTitle } from "../../../Repositories/WorkoutRepository";
+
 
 export async function getAllWorkouts(
   request: FastifyRequest,
@@ -9,6 +10,10 @@ export async function getAllWorkouts(
 ) {
   const decoded = await request.jwtVerify<{ id: number }>();
   const result = await workoutService.getAllWorkoutSerivce(reply, decoded.id);
+
+  if (reply.statusCode >= 400) {
+    return;
+  }
 
   return reply.status(200).send(result);
 }
@@ -25,7 +30,7 @@ export async function createWorkout(
 
   const decoded = await request.jwtVerify<{ id: number }>();
 
-  const [result, newWorkout] = await workoutService.createWorkoutService(
+  const result = await workoutService.createWorkoutService(
     reply,
     decoded.id,
     title,
@@ -33,9 +38,12 @@ export async function createWorkout(
     total_workout_volume,
   );
 
+  if (reply.statusCode >= 400) {
+    return;
+  }
+
   return reply.status(201).send({
-    _id: result.insertedId,
-    newWorkout,
+    newWorkout: result,
   });
 }
 
@@ -47,6 +55,10 @@ export async function deleteWorkout(
   const { title } = request.params as { title: string };
 
   await workoutService.deleteWorkoutService(reply, decoded.id, title);
+
+  if (reply.statusCode >= 400) {
+    return;
+  }
 
   return reply.status(200).send({ message: "Workout deleted", title });
 }
@@ -63,7 +75,7 @@ export async function updateWorkout(
     changedData: string | number;
   };
 
-  const result = workoutService.updateWorkoutService(
+  workoutService.updateWorkoutService(
     reply,
     decoded.id,
     title,
@@ -71,21 +83,21 @@ export async function updateWorkout(
     changedData,
   );
 
-  return reply.status(200).send(result);
+  if (reply.statusCode >= 400) {
+    return;
+  }
+
+  return reply.status(200).send({ message: "Workout updated successfully" });
 }
 
 export async function getWorkout(request: FastifyRequest, reply: FastifyReply) {
   const decoded = await request.jwtVerify<{ id: number }>();
   const { title } = request.params as { title: string };
 
-  const collection = await db.collection("workout_catalog");
-  const result = await collection.findOne({
-    user_id: decoded.id,
-    title: title,
-  });
+  const result = await getWorkoutByUserIdAndTitle(decoded.id, title);
 
   if (!result) {
-    reply.status(404).send({ message: "No Workout Found" });
+    return reply.status(404).send({ message: "No Workout Found" });
   }
 
   return reply.status(200).send(result);

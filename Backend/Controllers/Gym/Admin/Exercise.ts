@@ -4,7 +4,7 @@ import {
   type Equipments,
   type ExerciseCatalog,
   type MuscleGroups,
-} from "Backend/Types/gym";
+} from "../../../Types/gym";
 
 export async function createExerciseToCatalog(
   request: FastifyRequest,

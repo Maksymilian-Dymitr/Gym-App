@@ -1,37 +1,30 @@
 import { type FastifyReply, type FastifyRequest } from "fastify";
-import { db } from "../../../DB/mongo";
-import { type Sets } from "Backend/Types/gym";
+import * as exerciseService from "../../../Services/User/Exercise";
 
 export async function getExercise(
   request: FastifyRequest,
   reply: FastifyReply,
 ) {
   const { exercise } = request.params as { exercise: string };
-  const collection = db.collection("exercise_catalog");
-
-  if (!exercise || exercise === "") {
-    return reply.status(400).send({ error: "Invalid Exercise" });
+  const result = await exerciseService.getExerciseService(exercise, reply);
+  
+  if (reply.statusCode >= 400) {
+    return;
   }
-
-  const result = await collection.findOne({ name: exercise });
-
-  if (!result) {
-    return reply.status(404).send({ error: "Exercise not found" });
-  }
-
+  
   return reply.status(200).send(result);
 }
+
 export async function getAllExercises(
   request: FastifyRequest,
   reply: FastifyReply,
 ) {
-  const collection = db.collection("exercise_catalog");
-  const result = await collection.find({}).toArray();
-
-  if (result.length === 0) {
-    return reply.status(404).send({ error: "No Exercises found" });
+  const result = await exerciseService.getAllExercisesService(reply);
+  
+  if (reply.statusCode >= 400) {
+    return;
   }
-
+  
   return reply.status(200).send(result);
 }
 
@@ -42,55 +35,47 @@ export async function createSet(request: FastifyRequest, reply: FastifyReply) {
     reps: number;
     weight: number;
   };
-  if (!reps || reps === 0)
-    return reply.status(400).send({ error: "Reps are required" });
-  if (reps >= 30)
-    return reply.status(400).send({ error: "No more than 30 reps" });
 
-  if (!sets || sets === 0 || sets >= 8) {
-    return reply.status(400).send({ error: "Sets are required" });
+  const result = await exerciseService.createSetService(
+    exercise_name,
+    sets,
+    reps,
+    weight,
+    reply
+  );
+  
+  if (reply.statusCode >= 400) {
+    return;
   }
-  if (sets >= 10)
-    return reply.status(400).send({ error: "No more than 10 sets" });
-
-  if (!exercise_name || exercise_name.trim() === "") {
-    return reply.status(400).send({ error: "Exercise is required" });
-  }
-
-  const CatalogCollection = db.collection("exercise_catalog");
-  const collection = db.collection("sets");
-
-  const exerciseItem = await CatalogCollection.findOne({ name: exercise_name });
-  if (!exerciseItem) {
-    return reply.status(404).send({ error: "Exercise not found in catalog" });
-  }
-
-  const volumePerSet: number = reps * weight;
-  const totalVolume: number = volumePerSet * sets;
-
-  const newSet: Sets = {
-    name: exerciseItem.name,
-    equipment: exerciseItem.equipment,
-    muscleGroups: exerciseItem.muscleGroups,
-    performence: [
-      {
-        sets: sets,
-        reps: reps,
-        weight: weight,
-        volume: volumePerSet,
-      },
-    ],
-    total_exercise_volume: totalVolume,
-  };
-
-  const result = await collection.insertOne(newSet);
-
+  
   return reply.status(201).send({
-    _id: result.insertedId,
-    newExercise: newSet,
+    newExercise: result,
   });
 }
 
-export async function removeSet(request: FastifyRequest, reply: FastifyReply) { }
-export async function getAllSets(request: FastifyRequest, reply: FastifyReply) { }
-export async function getSet(request: FastifyRequest, reply: FastifyReply) { }
+export async function removeSet(request: FastifyRequest, reply: FastifyReply) {
+  const { id } = request.params as { id: string };
+  const result = await exerciseService.removeSetService(id, reply);
+  
+  if (reply.statusCode >= 400) {
+    return;
+  }
+  
+  return result;
+}
+
+export async function getAllSets(request: FastifyRequest, reply: FastifyReply) {
+  const result = await exerciseService.getAllSetsService(reply);
+  return reply.status(200).send(result);
+}
+
+export async function getSet(request: FastifyRequest, reply: FastifyReply) {
+  const { id } = request.params as { id: string };
+  const result = await exerciseService.getSetService(id, reply);
+  
+  if (reply.statusCode >= 400) {
+    return;
+  }
+  
+  return reply.status(200).send(result);
+}

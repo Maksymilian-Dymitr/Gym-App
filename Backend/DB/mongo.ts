@@ -9,6 +9,6 @@ export const db = client.db("gym_db")
 
 export async function connectMongo() {
     await client.connect();
-    console.log("Connect to MongoDB!");
+    console.log("Connected to MongoDB!");
     return db
 }

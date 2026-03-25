@@ -21,7 +21,7 @@ export type Sets = ExerciseCatalog & {
 
 export type WorkoutCatalog = {
   title: string;
-  creator_id: number; // postgres ID
+  creator_id: number;
   exercise_list: Sets[];
   total_workout_volume: number;
 };
