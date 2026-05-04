@@ -1,20 +1,13 @@
 import { type FastifyRequest, type FastifyReply } from "fastify";
+import { type User as PrismaUser, Role } from "@prisma/client";
 
-export interface User {
-  id: string;
-  email: string;
-  password?: string;
-  google_id?: string;
-  role: string;
-  created_at?: Date;
-  updated_at?: Date;
-}
+export type User = PrismaUser;
 
 export interface CreateUserRequest {
   email: string;
   password: string;
-  role: string;
-  google_id?: string;
+  role: Role;
+  google_id?: string | null;
 }
 
 export interface UserRepository {

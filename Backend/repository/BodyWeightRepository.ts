@@ -6,7 +6,7 @@ import type {
 import { prisma } from "../Lib/prisma";
 
 export async function getAllBodyWeightLogs(
-  user_id: number,
+  user_id: string,
 ): Promise<BodyWeightLog[]> {
   return prisma.bodyWeightLog.findMany({
     where: {
@@ -24,7 +24,7 @@ export async function createBodyWeightLog(
   return prisma.bodyWeightLog.create({
     data: {
       user_id: logData.user_id,
-      weight: logData.weight,
+      body_weight: logData.body_weight,
       date: logData.date,
     },
   });
@@ -40,14 +40,14 @@ export async function getBodyWeightLogById(
 
 export async function updateBodyWeightLog(
   id: string,
-  weight: number,
+  body_weight: number,
   date: Date,
 ): Promise<boolean> {
   try {
     await prisma.bodyWeightLog.update({
       where: { id },
       data: {
-        weight,
+        body_weight,
         date,
       },
     });

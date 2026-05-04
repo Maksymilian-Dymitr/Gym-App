@@ -3,7 +3,7 @@ import { getAllBodyWeightLogs, createBodyWeightLog, getBodyWeightLogById, update
 
 
 export async function getAllBodyWeightLogsService(
-  user_id: number,
+  user_id: string,
   reply: FastifyReply
 ) {
   const result = await getAllBodyWeightLogs(user_id);
@@ -16,13 +16,13 @@ export async function getAllBodyWeightLogsService(
 }
 
 export async function createBodyWeightLogService(
-  user_id: number,
-  weight: number,
+  user_id: string,
+  body_weight: number,
   date: Date,
   reply: FastifyReply
 ) {
-  if (!weight || weight <= 0) {
-    return reply.status(400).send({ error: "Valid weight is required" });
+  if (!body_weight || body_weight <= 0) {
+    return reply.status(400).send({ error: "Valid body_weight is required" });
   }
 
   if (!date) {
@@ -31,7 +31,7 @@ export async function createBodyWeightLogService(
 
   const result = await createBodyWeightLog({
     user_id,
-    weight,
+    body_weight,
     date
   });
   
@@ -53,19 +53,19 @@ export async function getBodyWeightLogService(
 
 export async function updateBodyWeightLogService(
   id: string,
-  weight: number,
+  body_weight: number,
   date: Date,
   reply: FastifyReply
 ) {
-  if (!weight || weight <= 0) {
-    return reply.status(400).send({ error: "Valid weight is required" });
+  if (!body_weight || body_weight <= 0) {
+    return reply.status(400).send({ error: "Valid body_weight is required" });
   }
 
   if (!date) {
     return reply.status(400).send({ error: "Date is required" });
   }
 
-  const result = await updateBodyWeightLog(id, weight, date);
+  const result = await updateBodyWeightLog(id, body_weight, date);
   
   if (!result) {
     return reply.status(404).send({ error: "Body weight log not found" });

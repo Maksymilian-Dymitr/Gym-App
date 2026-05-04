@@ -5,7 +5,7 @@ export interface CreateSetRequest {
   sets: number;
   reps: number;
   weight: number;
-  user_id: number; 
+  user_id: string; 
 }
 
 export interface ExerciseRepository {

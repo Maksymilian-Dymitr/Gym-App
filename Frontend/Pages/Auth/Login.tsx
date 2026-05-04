@@ -1,20 +1,16 @@
-import Input from "../Componets/Input";
+import Input from "../../Componets/Input";
 import { GoogleLogin, googleLogout } from "@react-oauth/google";
 import { useState } from "react";
-import {useNavigate} from "react-router-dom"
+import { useNavigate } from "react-router-dom";
 
-const Login= () => {
+const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handelGoogleOauth2Login = () => {
-    
-  };
+  const handelGoogleOauth2Login = () => {};
   //credentails is a jwt
-  
-  const handelLogout = () => {
-    
-  }
+
+  const handelLogout = () => {};
 
   return (
     <div className="fixed w-full h-full bg-[#282c33] flex justify-center items-center">
@@ -29,10 +25,12 @@ const Login= () => {
           Login
         </button>
 
+        <div className="pt-3">
         <GoogleLogin
           onSuccess={handelGoogleOauth2Login}
           onError={() => console.log("Login failed")}
         />
+        </div>
       </div>
     </div>
   );

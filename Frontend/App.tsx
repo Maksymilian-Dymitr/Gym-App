@@ -2,7 +2,7 @@ import Input from "./Componets/Input";
 import { GoogleLogin, googleLogout } from "@react-oauth/google";
 import { useState } from "react";
 import {useNavigate} from "react-router-dom"
-import Login from "./Auth/Login";
+import Login from "./Pages/Auth/Login";
 
 const Fitness = () => {
   const [email, setEmail] = useState("");

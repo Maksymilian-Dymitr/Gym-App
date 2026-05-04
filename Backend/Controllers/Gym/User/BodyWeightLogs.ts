@@ -18,14 +18,14 @@ export async function createBodyWeightLog(
   request: FastifyRequest,
   reply: FastifyReply,
 ) {
-  const { weight, date } = request.body as {
-    weight: number;
+  const { body_weight, date } = request.body as {
+    body_weight: number;
     date: Date;
   };
 
   const result = await bodyWeightService.createBodyWeightLogService(
     (request.user as any).id,
-    weight,
+    body_weight,
     date,
     reply
   );
@@ -56,14 +56,14 @@ export async function updateBodyWeightLog(
   reply: FastifyReply,
 ) {
   const { id } = request.params as { id: string };
-  const { weight, date } = request.body as {
-    weight: number;
+  const { body_weight, date } = request.body as {
+    body_weight: number;
     date: Date;
   };
 
   const result = await bodyWeightService.updateBodyWeightLogService(
     id,
-    weight,
+    body_weight,
     date,
     reply
   );

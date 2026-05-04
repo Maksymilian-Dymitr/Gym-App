@@ -4,7 +4,7 @@ import type { CreateWorkoutRequest } from "../Types/Repositories/WorkoutReposito
 import { prisma } from "../Lib/prisma";
 
 export async function getAllWorkoutsByUserId(
-  user_id: number
+  user_id: string
 ): Promise<WorkoutCatalog[]> {
   return prisma.workout.findMany({
     where: {
@@ -22,7 +22,7 @@ export async function createWorkout(
 }
 
 export async function deleteWorkout(
-  user_id: number,
+  user_id: string,
   title: string
 ): Promise<boolean> {
   const result = await prisma.workout.deleteMany({
@@ -36,7 +36,7 @@ export async function deleteWorkout(
 }
 
 export async function updateWorkout(
-  user_id: number,
+  user_id: string,
   title: string,
   updateField: string,
   updateValue: any
@@ -59,7 +59,7 @@ export async function updateWorkout(
 }
 
 export async function getWorkoutByUserIdAndTitle(
-  user_id: number,
+  user_id: string,
   title: string
 ): Promise<WorkoutCatalog | null> {
   return prisma.workout.findFirst({
