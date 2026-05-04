@@ -1,4 +1,4 @@
-export type { IUser, ICreateUserRequest, IUserRepository } from "./IUserRepository";
-export type { ICreateSetRequest, IExerciseRepository } from "./IExerciseRepository";
-export type { ICreateWorkoutRequest, IWorkoutRepository } from "./IWorkoutRepository";
-export type { IBodyWeightLog, ICreateBodyWeightLogRequest, IBodyWeightRepository } from "./IBodyWeightRepository";
+export type { User, CreateUserRequest, UserRepository } from "./UserRepository";
+export type { CreateSetRequest, ExerciseRepository } from "./ExerciseRepository";
+export type { CreateWorkoutRequest, WorkoutRepository } from "./WorkoutRepository";
+export type { BodyWeightLog, CreateBodyWeightLogRequest, BodyWeightRepository } from "./BodyWeightRepository";

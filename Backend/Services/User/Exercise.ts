@@ -1,6 +1,6 @@
-import { type FastifyReply } from "fastify";
-import { getExerciseByName, getAllExercises, createSet, getSetById, getAllSets, removeSet } from "../../Repositories/ExerciseRepository";
-import type { ICreateSetRequest } from "../../Types/Repositories/IExerciseRepository";
+import type { FastifyReply } from "fastify";
+import { getExerciseByName, getAllExercises, createSet, getSetById, getAllSets, removeSet } from "../../repository/ExerciseRepository";
+import type { CreateSetRequest } from "../../Types/Repositories/ExerciseRepository";
 
 export async function getExerciseService(
   exercise: string,
@@ -34,14 +34,15 @@ export async function createSetService(
   sets: number,
   reps: number,
   weight: number,
-  reply: FastifyReply
+  reply: FastifyReply,
+  user_id: number
 ) {
   if (!reps || reps === 0)
     return reply.status(400).send({ error: "Reps are required" });
   if (reps >= 30)
     return reply.status(400).send({ error: "No more than 30 reps" });
 
-  if (!sets || sets === 0 || sets >= 8) {
+  if (!sets || sets === 0) {
     return reply.status(400).send({ error: "Sets are required" });
   }
   if (sets >= 10)
@@ -55,7 +56,8 @@ export async function createSetService(
     exercise_name,
     sets,
     reps,
-    weight
+    weight,
+    user_id
   });
   return result;
 }
@@ -75,6 +77,11 @@ export async function getSetService(
 
 export async function getAllSetsService(reply: FastifyReply) {
   const result = await getAllSets();
+  
+  if (result.length === 0) {
+    return reply.status(404).send({ error: "No sets found" });
+  }
+  
   return result;
 }
 

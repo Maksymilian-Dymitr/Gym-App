@@ -1,7 +1,4 @@
-import {
-  type FastifyInstance,
-  type FastifyPluginOptions,
-} from "fastify";
+import type { FastifyInstance, FastifyPluginOptions } from "fastify";
 import authRoutes from "./authRoutes";
 import exerciseRoutes from "./exerciseRoutes";
 import workoutRoutes from "./workoutRoutes";

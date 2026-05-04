@@ -1,10 +1,6 @@
-import {
-  type FastifyInstance,
-  type FastifyPluginOptions,
-} from "fastify";
-
+import type { FastifyInstance, FastifyPluginOptions } from "fastify";
 import * as workoutCtrls from "../Controllers/Gym/User/Workout";
-import { verifyUser } from "../Middleware/auth";
+import { verifyUser } from "../middleware/auth";
 
 async function workoutRoutes(
   server: FastifyInstance,
@@ -18,7 +14,7 @@ async function workoutRoutes(
   server.get("/workout/:id", { preHandler: authenticate }, workoutCtrls.getWorkout);
   server.get("/workouts", { preHandler: authenticate }, workoutCtrls.getAllWorkouts);
   server.delete(
-    "/workouts/:id",
+    "/workouts/:title",
     { preHandler: authenticate },
     workoutCtrls.deleteWorkout,
   );

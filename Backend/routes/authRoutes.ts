@@ -1,10 +1,6 @@
-import {
-  type FastifyInstance,
-  type FastifyPluginOptions,
-} from "fastify";
+import type { FastifyInstance, FastifyPluginOptions } from "fastify";
 import * as auth from "../Controllers/Auth/auth";
-import { refreshToken } from "../Services/User/auth";
-import { verifyUser } from "../Middleware/auth";
+import { verifyUser } from "../middleware/auth";
 
 async function authRoutes(
   server: FastifyInstance,
@@ -17,7 +13,7 @@ async function authRoutes(
   server.post("/auth/login", auth.login);
   server.post("/auth/signout", auth.signout);
   server.get("/login/google/callback", auth.googleCallback);
-  server.post("/auth/refresh", refreshToken);
+  server.post("/auth/refresh", auth.refreshToken);
   
   server.get("/login/google", async (request, reply) => {
     const clientID = process.env.GOOGLE_CLIENT_ID;

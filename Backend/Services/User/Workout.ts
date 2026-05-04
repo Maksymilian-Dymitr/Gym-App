@@ -1,6 +1,5 @@
-import { type FastifyReply } from "fastify";
-import { type WorkoutCatalog } from "../../Types/gym";
-import { getAllWorkoutsByUserId, createWorkout, deleteWorkout, updateWorkout } from "../../Repositories/WorkoutRepository";
+import type { FastifyReply } from "fastify";
+import { getAllWorkoutsByUserId, createWorkout, deleteWorkout, updateWorkout } from "../../repository/WorkoutRepository";
 
 
 export async function getAllWorkoutSerivce(

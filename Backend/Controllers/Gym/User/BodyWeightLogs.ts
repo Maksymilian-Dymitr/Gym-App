@@ -1,12 +1,16 @@
-import { type FastifyReply, type FastifyRequest } from "fastify";
+import type { FastifyReply, FastifyRequest } from "fastify";
 import * as bodyWeightService from "../../../Services/User/BodyWeightLogs";
 
 export async function getAllBodyWeightLogs(
   request: FastifyRequest,
   reply: FastifyReply,
 ) {
-  const decoded = await request.jwtVerify<{ id: number }>();
-  const result = await bodyWeightService.getAllBodyWeightLogsService(decoded.id, reply);
+  const result = await bodyWeightService.getAllBodyWeightLogsService((request.user as any).id, reply);
+  
+  if (reply.statusCode >= 400) {
+    return;
+  }
+  
   return reply.status(200).send(result);
 }
 
@@ -19,10 +23,8 @@ export async function createBodyWeightLog(
     date: Date;
   };
 
-  const decoded = await request.jwtVerify<{ id: number }>();
-
   const result = await bodyWeightService.createBodyWeightLogService(
-    decoded.id,
+    (request.user as any).id,
     weight,
     date,
     reply

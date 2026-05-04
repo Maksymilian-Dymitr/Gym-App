@@ -1,4 +1,4 @@
-import { type FastifyReply, type FastifyRequest } from "fastify";
+import type {FastifyReply, FastifyRequest } from "fastify";
 import * as exerciseService from "../../../Services/User/Exercise";
 
 export async function getExercise(
@@ -41,7 +41,8 @@ export async function createSet(request: FastifyRequest, reply: FastifyReply) {
     sets,
     reps,
     weight,
-    reply
+    reply,
+    (request.user as any).id
   );
   
   if (reply.statusCode >= 400) {
@@ -66,6 +67,11 @@ export async function removeSet(request: FastifyRequest, reply: FastifyReply) {
 
 export async function getAllSets(request: FastifyRequest, reply: FastifyReply) {
   const result = await exerciseService.getAllSetsService(reply);
+  
+  if (reply.statusCode >= 400) {
+    return;
+  }
+  
   return reply.status(200).send(result);
 }
 

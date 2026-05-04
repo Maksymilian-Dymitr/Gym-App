@@ -1,69 +1,169 @@
 import { type FastifyReply, type FastifyRequest } from "fastify";
-import * as authServices from "../../Services/User/auth";
-import * as adminAuthServices from "../../Services/Admin/auth";
-
+import type { TokenPayLoad } from "../../Types/jwt";
+import { UserAuthService } from "../../Services/User/auth";
+import { AdminAuthService } from "../../Services/Admin/auth";
 
 export async function signin(request: FastifyRequest, reply: FastifyReply) {
-  const { email, password } = request.body as {
-    email: string;
-    password: string;
-  };
+  try {
+    const { email, password } = request.body as {
+      email: string;
+      password: string;
+    };
 
-  const result = await adminAuthServices.createUser(
-    email,
-    password,
-    "User",
-    request,
-  );
+    const result = await AdminAuthService.createUser(
+      email,
+      password,
+      "User",
+    );
 
-  reply.status(201).send({
-    message: "New User has been Created",
-    user: result.rows[0],
-  });
+    reply.status(201).send({
+      message: "New User has been Created",
+      user: result,
+    });
+  } catch (error: any) {
+    reply.status(500).send({ message: "Failed to create user", error: error?.message || "Unknown error" });
+  }
 }
 
 export async function login(request: FastifyRequest, reply: FastifyReply) {
-  const { email, password } = request.body as {
-    email: string;
-    password: string;
-  };
-  const user = await authServices.loginUser(email, password, request, reply);
-  
-  if (reply.statusCode >= 400 || !user) {
-    console.log("Login failed, statusCode:", reply.statusCode);
-    return; 
+  try {
+    const { email, password } = request.body as {
+      email: string;
+      password: string;
+    };
+
+    const user = await UserAuthService.loginUser(email, password);
+
+    const accessToken = await reply.jwtSign(
+      { id: user.id, role: user.role, type: "access" },
+      { expiresIn: "1h" },
+    );
+    const refreshToken = await reply.jwtSign(
+      { id: user.id, role: user.role, type: "refresh" },
+      { expiresIn: "30d" },
+    );
+
+    reply.setCookie("accessToken", accessToken, {
+      path: "/",
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
+    reply.setCookie("refreshToken", refreshToken, {
+      path: "/",
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
+
+    const response = { 
+      message: "Login Successful", 
+      accessToken, 
+      refreshToken,
+      user: { id: user.id, email: user.email, role: user.role } 
+    };
+    
+    reply.status(200).send(response);
+  } catch (error: any) {
+    if (error?.message === "No User Found" || error?.message === "Invalid password") {
+      return reply.status(401).send({ message: "Invalid credentials" });
+    }
+    return reply.status(500).send({ message: "Server error", error: error?.message });
   }
-  
-  console.log("Generating tokens for user:", user.id, user.role);
-  const token = await authServices.generateToken(user.id, user.role, reply);
-  
-  console.log("Tokens generated:", token);
-  const response = { message: "Login Succsessful", ...token, user: { id: user.id, email: user.email, role: user.role } };
-  console.log("Sending response:", response);
-  
-  reply.status(200).send(response);
 }
 
 export async function signout(request: FastifyRequest, reply: FastifyReply) {
-  reply.clearCookie("accessToken", { path: "/" });
-  reply.clearCookie("refreshToken", { path: "/" });
-  return reply.status(200).send({ message: "Logout Succsessful" });
+  try {
+    reply.clearCookie("accessToken", { path: "/" });
+    reply.clearCookie("refreshToken", { path: "/" });
+    return reply.status(200).send({ message: "Logout Successful" });
+  } catch (error: any) {
+    return reply.status(500).send({ message: "Failed to logout", error: error?.message });
+  }
 }
 
 export async function googleCallback(
   request: FastifyRequest,
   reply: FastifyReply,
 ) {
-  const { code } = request.query as { code: string };
-  
-  if (!code) {
-    return reply.status(400).send({ error: "Authorization code not provided" });
+  try {
+    const { code } = request.query as { code: string };
+    
+    if (!code) {
+      return reply.status(400).send({ error: "Authorization code not provided" });
+    }
+
+    const { user } = await UserAuthService.googleOAuthService(code);
+
+    const accessToken = await reply.jwtSign(
+      { id: user.id, role: user.role, type: "access" },
+      { expiresIn: "1h" },
+    );
+    const refreshToken = await reply.jwtSign(
+      { id: user.id, role: user.role, type: "refresh" },
+      { expiresIn: "30d" },
+    );
+
+    reply.setCookie("accessToken", accessToken, {
+      path: "/",
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
+    reply.setCookie("refreshToken", refreshToken, {
+      path: "/",
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
+
+    return reply.redirect(
+      `http://localhost:3001/login-success?token=${accessToken}&userId=${user.id}&role=${user.role}&email=${user.email}`
+    );
+  } catch (error: any) {
+    return reply.status(500).send({ message: "Google OAuth failed", error: error?.message });
   }
+}
 
-  const { user, email } = await authServices.googleOAuthService(code, request);
-  const tokens = await authServices.generateToken(user.id, user.role, reply);
+export async function refreshToken(
+  request: FastifyRequest,
+  reply: FastifyReply,
+) {
+  try {
+    const refresh_token = request.cookies.refreshToken;
+    if (!refresh_token) {
+      return reply.status(401).send({ message: "No Refresh Token" });
+    }
 
-  return reply.redirect(
-    `http://localhost:3001/login-success?token=${tokens.accessToken}&userId=${user.id}&role=${user.role}&email=${email}`
-  );
+    const decoded = await request.jwtVerify<TokenPayLoad>();
+    if (decoded.type !== "refresh") {
+      return reply.status(401).send({ message: "Not Authorized" });
+    }
+
+    const accessToken = await reply.jwtSign(
+      { id: decoded.user_id, role: decoded.role, type: "access" },
+      { expiresIn: "1h" },
+    );
+    const refreshToken = await reply.jwtSign(
+      { id: decoded.user_id, role: decoded.role, type: "refresh" },
+      { expiresIn: "30d" },
+    );
+
+    reply.setCookie("accessToken", accessToken, {
+      path: "/",
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
+    reply.setCookie("refreshToken", refreshToken, {
+      path: "/",
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
+
+    return reply.status(200).send({ accessToken, refreshToken });
+  } catch (error: any) {
+    return reply.status(401).send({ message: "Invalid refresh token" });
+  }
 }

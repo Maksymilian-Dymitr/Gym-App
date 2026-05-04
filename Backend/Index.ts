@@ -1,19 +1,20 @@
-import { createApp } from "./Config/app";
-import { setupErrorHandlers } from "./Config/errorHandlers";
-import { setupDatabase } from "./Config/database";
-import { startServer } from "./Config/server";
-import routes from "./Route/routes";
+import { setupErrorHandlers } from "./config/errorHandlers";
+import { setupDatabase } from "./config/database";
+import fastify from "fastify";
+import routes from "./routes/routes";
 
 async function start() {
-  const app = await createApp();
-  
-  setupErrorHandlers(app);
-  
+  const app = fastify({ logger: true });
+
   await setupDatabase(app);
-  
+
   await app.register(routes);
   
-  await startServer(app);
+  setupErrorHandlers(app);
+
+  app.listen({ port: Number(process.env.PORT) || 3001, host: "0.0.0.0" }, (address) =>
+    console.log(`Server is running at ${address}`),
+  );
 }
 
 start();

@@ -1,5 +1,5 @@
 import { type FastifyReply } from "fastify";
-import { getAllBodyWeightLogs, createBodyWeightLog, getBodyWeightLogById, updateBodyWeightLog, deleteBodyWeightLog } from "../../Repositories/BodyWeightRepository";
+import { getAllBodyWeightLogs, createBodyWeightLog, getBodyWeightLogById, updateBodyWeightLog, deleteBodyWeightLog } from "../../repository/BodyWeightRepository";
 
 
 export async function getAllBodyWeightLogsService(
@@ -7,6 +7,11 @@ export async function getAllBodyWeightLogsService(
   reply: FastifyReply
 ) {
   const result = await getAllBodyWeightLogs(user_id);
+  
+  if (result.length === 0) {
+    return reply.status(404).send({ error: "No bodyweight logs found" });
+  }
+  
   return result;
 }
 

@@ -1,74 +1,58 @@
-import { type FastifyReply, type FastifyRequest } from "fastify";
-import { db } from "../../../DB/mongo";
-import {
-  type Equipments,
-  type ExerciseCatalog,
-  type MuscleGroups,
-} from "../../../Types/gym";
+import type { FastifyReply, FastifyRequest } from "fastify";
+import type { Equipments, MuscleGroups } from "../../../Types/gym";
+import { ExerciseService } from "../../../Services/Admin/Exercise";
 
-export async function createExerciseToCatalog(
+export async function createExerciseHandler(
   request: FastifyRequest,
   reply: FastifyReply,
 ) {
-  const { name, equipment, muscleGroups } = request.body as {
-    name: string;
-    equipment: Equipments;
-    muscleGroups: MuscleGroups;
-  };
+  try {
+    const { name, equipment, muscleGroups } = request.body as {
+      name: string;
+      equipment: Equipments;
+      muscleGroups: MuscleGroups;
+    };
 
-  const collection = db.collection("exercise_catalog");
+    const result = await ExerciseService.createExercise(
+      name,
+      equipment,
+      muscleGroups,
+    );
 
-  if (!name || name.trim() === "") {
-    return reply.status(400).send({ error: "Name is required" });
+    return reply.status(201).send({
+      message: "Exercise created successfully",
+      exercise: result,
+    });
+  } catch (error: any) {
+    return reply.status(400).send({ 
+      message: "Failed to create exercise", 
+      error: error?.message || "Unknown error" 
+    });
   }
-  if (!equipment || !Array.isArray(equipment) || equipment.length === 0) {
-    return reply
-      .status(400)
-      .send({ error: "At least one equimpent is required" });
-  }
-  if (
-    !muscleGroups ||
-    !Array.isArray(muscleGroups) ||
-    muscleGroups.length === 0
-  ) {
-    return reply
-      .status(400)
-      .send({ error: "At least one muscle group is required" });
-  }
-
-  const newExercise = {
-    name: name,
-    equipment: equipment,
-    muscleGroups: muscleGroups,
-  };
-  const result = await collection.insertOne(<ExerciseCatalog>newExercise);
-
-  return reply.status(200).send({
-    _id: result.insertedId,
-    newExercise,
-  });
 }
 
-export async function deleteExerciseFromCatalog(
+export async function deleteExerciseHandler(
   request: FastifyRequest,
   reply: FastifyReply,
 ) {
-  const { name } = request.params as { name: string };
+  try {
+    const { name } = request.params as { name: string };
 
-  const collection = db.collection("exercise_catalog");
+    await ExerciseService.deleteExercise(name);
 
-  if (!name) {
-    return reply.status(400).send({ error: "Exercise name is required" });
+    return reply.status(200).send({
+      message: "Exercise deleted successfully",
+    });
+  } catch (error: any) {
+    if (error?.message === "Exercise not found") {
+      return reply.status(404).send({ message: "Exercise not found" });
+    } else if (error?.message === "Exercise name is required") {
+      return reply.status(400).send({ message: "Exercise name is required" });
+    } else {
+      return reply.status(500).send({ 
+        message: "Failed to delete exercise", 
+        error: error?.message || "Unknown error" 
+      });
+    }
   }
-
-  const result = await collection.deleteMany({ name: name });
-
-  if (result.deletedCount === 0) {
-    return reply.status(404).send({ error: "Exercise not found" });
-  }
-
-  return reply.status(200).send({
-    message: `Successfully deleted ${result.deletedCount}`,
-    deleteCount: result.deletedCount,
-  });
 }

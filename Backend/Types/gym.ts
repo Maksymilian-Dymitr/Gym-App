@@ -17,6 +17,7 @@ export type SetDetails = {
 export type Sets = ExerciseCatalog & {
   performence: SetDetails[]
   total_exercise_volume: number
+  user_id: number 
 }
 
 export type WorkoutCatalog = {
@@ -28,7 +29,7 @@ export type WorkoutCatalog = {
 
 export type Workouts = WorkoutCatalog & {
   date: Date;
-  user_id: number;
+  creator_id: number; 
   duration_minutes?: number;
 };
 

@@ -1,11 +1,7 @@
-import {
-  type FastifyInstance,
-  type FastifyPluginOptions,
-} from "fastify";
-
+import type { FastifyInstance, FastifyPluginOptions } from "fastify";
 import * as exerciseCtrls from "../Controllers/Gym/User/Exercise";
-import * as gymSchema from "../Schema/Gym";
-import { verifyUser } from "../Middleware/auth";
+import * as gymSchema from "../schema/Gym";
+import { verifyUser } from "../middleware/auth";
 
 async function exerciseRoutes(
   server: FastifyInstance,
@@ -31,7 +27,7 @@ async function exerciseRoutes(
   );
 
   server.get(
-    "/exercise/:exerciseId",
+    "/exercise/:exercise",
     {
       schema: { response: { 200: gymSchema.ExerciseCatalogSchema } },
       preHandler: authenticate,
@@ -42,7 +38,7 @@ async function exerciseRoutes(
   server.post("/sets", { preHandler: authenticate }, exerciseCtrls.createSet);
   server.delete("/sets/:id", { preHandler: authenticate }, exerciseCtrls.removeSet);
   server.get("/sets", { preHandler: authenticate }, exerciseCtrls.getAllSets);
-  server.get("/sets/:setId", { preHandler: authenticate }, exerciseCtrls.getSet);
+  server.get("/sets/:id", { preHandler: authenticate }, exerciseCtrls.getSet);
 }
 
 export default exerciseRoutes;

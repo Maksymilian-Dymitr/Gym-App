@@ -1,15 +1,14 @@
-import { type FastifyReply, type FastifyRequest } from "fastify";
-import { type Sets } from "../../../Types/gym";
+import type { FastifyReply, FastifyRequest } from "fastify";
+import type { Sets } from "../../../Types";
 import * as workoutService from "../../../Services/User/Workout";
-import { getWorkoutByUserIdAndTitle } from "../../../Repositories/WorkoutRepository";
 
+import { getWorkoutByUserIdAndTitle } from "../../../repository/WorkoutRepository";
 
 export async function getAllWorkouts(
   request: FastifyRequest,
   reply: FastifyReply,
 ) {
-  const decoded = await request.jwtVerify<{ id: number }>();
-  const result = await workoutService.getAllWorkoutSerivce(reply, decoded.id);
+  const result = await workoutService.getAllWorkoutSerivce(reply, (request.user as any).id);
 
   if (reply.statusCode >= 400) {
     return;
@@ -28,11 +27,9 @@ export async function createWorkout(
     total_workout_volume: number;
   };
 
-  const decoded = await request.jwtVerify<{ id: number }>();
-
   const result = await workoutService.createWorkoutService(
     reply,
-    decoded.id,
+    (request.user as any).id,
     title,
     exercise_list,
     total_workout_volume,
@@ -51,10 +48,9 @@ export async function deleteWorkout(
   request: FastifyRequest,
   reply: FastifyReply,
 ) {
-  const decoded = await request.jwtVerify<{ id: number }>();
   const { title } = request.params as { title: string };
 
-  await workoutService.deleteWorkoutService(reply, decoded.id, title);
+  await workoutService.deleteWorkoutService(reply, (request.user as any).id, title);
 
   if (reply.statusCode >= 400) {
     return;
@@ -67,8 +63,6 @@ export async function updateWorkout(
   request: FastifyRequest,
   reply: FastifyReply,
 ) {
-  const decoded = await request.jwtVerify<{ id: number }>();
-
   const { title, typeOfChange, changedData } = request.body as {
     title: string;
     typeOfChange: string;
@@ -77,7 +71,7 @@ export async function updateWorkout(
 
   workoutService.updateWorkoutService(
     reply,
-    decoded.id,
+    (request.user as any).id,
     title,
     typeOfChange,
     changedData,
@@ -91,14 +85,16 @@ export async function updateWorkout(
 }
 
 export async function getWorkout(request: FastifyRequest, reply: FastifyReply) {
-  const decoded = await request.jwtVerify<{ id: number }>();
-  const { title } = request.params as { title: string };
+  const { id } = request.params as { id: string };
 
-  const result = await getWorkoutByUserIdAndTitle(decoded.id, title);
+  console.log("Searching for workout with:", { user_id: (request.user as any).id, title: id });
+  const result = await getWorkoutByUserIdAndTitle((request.user as any).id, id);
 
   if (!result) {
+    console.log("Workout not found for:", { user_id: (request.user as any).id, title: id });
     return reply.status(404).send({ message: "No Workout Found" });
   }
 
+  console.log("Workout found:", result);
   return reply.status(200).send(result);
 }

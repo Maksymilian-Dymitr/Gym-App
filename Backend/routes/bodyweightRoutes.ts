@@ -1,10 +1,7 @@
-import {
-  type FastifyInstance,
-  type FastifyPluginOptions,
-} from "fastify";
+import type { FastifyInstance, FastifyPluginOptions } from "fastify";
 
 import * as bodyWeightCtrls from "../Controllers/Gym/User/BodyWeightLogs";
-import { verifyUser } from "../Middleware/auth";
+import { verifyUser } from "../middleware/auth";
 
 async function bodyweightRoutes(
   server: FastifyInstance,

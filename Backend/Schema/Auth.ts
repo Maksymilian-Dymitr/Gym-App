@@ -5,12 +5,12 @@ export const UserSchema = {
   required: ["email", "role", "id"],
   properties: {
     email: { type: "string", format: "email" },
-    password: { type: "string", minimum: 6 },
+    password: { type: "string", minLength: 6 },
     google_id: { type: "string", nullable: true },
     role: { type: "string", enum: user_role },
     height_cm: { type: "number", minimum: 0, maximum: 300 },
     weight_kg: { type: "number", minimum: 0, maximum: 300 },
-    created_at: { type: "string" },
-    id: { type: "number", format: "date-time" },
+    created_at: { type: "string", format:"date-time" },
+    id: { type: "number" },
   },
 };
