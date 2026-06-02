@@ -10,7 +10,7 @@ async function workoutRoutes(
     verifyUser(request, reply);
 
   server.post("/workout", { preHandler: authenticate }, workoutCtrls.createWorkout);
-  server.post("/workout/:id", { preHandler: authenticate }, workoutCtrls.updateWorkout);
+  server.put("/workout/:id", { preHandler: authenticate }, workoutCtrls.updateWorkout);
   server.get("/workout/:id", { preHandler: authenticate }, workoutCtrls.getWorkout);
   server.get("/workouts", { preHandler: authenticate }, workoutCtrls.getAllWorkouts);
   server.delete(

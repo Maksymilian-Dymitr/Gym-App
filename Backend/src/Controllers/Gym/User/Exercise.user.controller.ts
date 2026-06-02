@@ -66,7 +66,7 @@ export async function removeSet(request: FastifyRequest, reply: FastifyReply) {
 }
 
 export async function getAllSets(request: FastifyRequest, reply: FastifyReply) {
-  const result = await exerciseService.getAllSetsService(reply);
+  const result = await exerciseService.getAllSetsService(reply, (request.user as any).id);
   
   if (reply.statusCode >= 400) {
     return;

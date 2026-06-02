@@ -1,7 +1,7 @@
 import { type FastifyReply, type FastifyRequest } from "fastify";
 import type { TokenPayLoad } from "../../Types/jwt.type";
 import { UserAuthService } from "../../Services/User/auth.service";
-import { AdminAuthService } from "../../Services/Admin/auth.service";
+import { AdminAuthService } from "../../Services/Admin/Auth.admin.service";
 
 export async function signin(request: FastifyRequest, reply: FastifyReply) {
   try {
@@ -141,11 +141,11 @@ export async function refreshToken(
     }
 
     const accessToken = await reply.jwtSign(
-      { id: decoded.user_id, role: decoded.role, type: "access" },
+      { id: decoded.id, role: decoded.role, type: "access" },
       { expiresIn: "1h" },
     );
     const refreshToken = await reply.jwtSign(
-      { id: decoded.user_id, role: decoded.role, type: "refresh" },
+      { id: decoded.id, role: decoded.role, type: "refresh" },
       { expiresIn: "30d" },
     );
 

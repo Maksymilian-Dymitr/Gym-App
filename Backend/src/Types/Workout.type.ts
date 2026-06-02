@@ -7,6 +7,7 @@ export interface CreateWorkoutRequest {
   date: Date;
   total_workout_volume: number;
   duration_minutes?: number;
+  set_ids: string[];
 }
 
 export interface WorkoutRepository {

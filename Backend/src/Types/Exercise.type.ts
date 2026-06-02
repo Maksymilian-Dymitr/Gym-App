@@ -13,6 +13,6 @@ export interface ExerciseRepository {
   getAllExercises(): Promise<ExerciseCatalog[]>;
   createSet(setData: CreateSetRequest): Promise<Sets>;
   getSetById(id: string): Promise<Sets | null>;
-  getAllSets(): Promise<Sets[]>;
+  getAllSets(user_id: string): Promise<Sets[]>;
   removeSet(id: string): Promise<boolean>;
 }

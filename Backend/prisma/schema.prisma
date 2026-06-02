@@ -51,6 +51,9 @@ model Set {
   user_id               String
   user                  User     @relation(fields: [user_id], references: [id])
 
+  workout_id            String?
+  workout               Workout? @relation(fields: [workout_id], references: [id])
+
   created_at            DateTime @default(now())
 }
 
@@ -65,6 +68,7 @@ model Workout {
   total_workout_volume  Float
 
   user                  User     @relation(fields: [user_id], references: [id])
+  sets                  Set[]
 
   created_at            DateTime @default(now())
 }

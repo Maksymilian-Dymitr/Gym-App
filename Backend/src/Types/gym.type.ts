@@ -25,6 +25,7 @@ export type Sets = {
   volume: number;
   total_exercise_volume: number;
   user_id: string;
+  workout_id: string | null;
   created_at: Date;
 };
 
@@ -37,6 +38,7 @@ export type WorkoutCatalog = {
   duration_minutes: number | null;
   total_workout_volume: number;
   created_at: Date;
+  sets?: Sets[];
 };
 
 export type Workouts = WorkoutCatalog & {
