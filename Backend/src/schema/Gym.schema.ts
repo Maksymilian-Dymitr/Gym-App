@@ -36,7 +36,7 @@ export const SetSchema = {
 
 export const WorkoutCatalogSchema = {
   type: "object",
-  required: ["titel", "creator_id", "exercise_list", "total_workout_volume"],
+  required: ["title", "creator_id", "exercise_list", "total_workout_volume"],
   properties: {
     title: { type: "string", minLength: 2 },
     creator_id: { type: "number" },

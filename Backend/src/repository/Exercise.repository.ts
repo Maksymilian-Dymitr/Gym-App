@@ -51,8 +51,8 @@ export async function getSetById(id: string): Promise<Sets | null> {
   });
 }
 
-export async function getAllSets(): Promise<Sets[]> {
-  return prisma.set.findMany();
+export async function getAllSets(user_id: string): Promise<Sets[]> {
+  return prisma.set.findMany({ where: { user_id } });
 }
 
 export async function removeSet(id: string): Promise<boolean> {

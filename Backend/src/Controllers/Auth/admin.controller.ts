@@ -1,5 +1,5 @@
 import { type FastifyReply, type FastifyRequest } from "fastify";
-import { AdminAuthService } from "../../Services/Admin/auth.service";
+import { AdminAuthService } from "../../Services/Admin/Auth.admin.service";
 import { getAllUsers } from "../../repository/User.repository";
 
 export async function createAdmin(

@@ -1,5 +1,4 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
-import type { Sets } from "../../../Types/index.";
 import * as workoutService from "../../../Services/User/Workout.service";
 
 import { getWorkoutByUserIdAndTitle } from "../../../repository/Workout.repository";
@@ -21,9 +20,9 @@ export async function createWorkout(
   request: FastifyRequest,
   reply: FastifyReply,
 ) {
-  const { title, exercise_list, total_workout_volume } = request.body as {
+  const { title, set_ids, total_workout_volume } = request.body as {
     title: string;
-    exercise_list: Sets[];
+    set_ids: string[];
     total_workout_volume: number;
   };
 
@@ -31,7 +30,7 @@ export async function createWorkout(
     reply,
     (request.user as any).id,
     title,
-    exercise_list,
+    set_ids,
     total_workout_volume,
   );
 

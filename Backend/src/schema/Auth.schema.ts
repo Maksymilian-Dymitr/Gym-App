@@ -11,6 +11,6 @@ export const UserSchema = {
     height_cm: { type: "number", minimum: 0, maximum: 300 },
     weight_kg: { type: "number", minimum: 0, maximum: 300 },
     created_at: { type: "string", format:"date-time" },
-    id: { type: "number" },
+    id: { type: "string" },
   },
 };

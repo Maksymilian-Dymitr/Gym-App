@@ -23,32 +23,25 @@ export async function createWorkoutService(
   reply: FastifyReply,
   user_id: string,
   title: string,
-  exercise_list: any[],
+  set_ids: string[],
   total_workout_volume: number,
 ) {
   if (!title || title.trim() === "") {
-    reply.status(400).send({ error: "Title is required" });
-    throw new Error("Title is required");
+    return reply.status(400).send({ error: "Title is required" });
   }
-  if (
-    !exercise_list ||
-    !Array.isArray(exercise_list) ||
-    exercise_list.length === 0
-  ) {
-    return reply
-      .status(400)
-      .send({ error: "At Least One Exercise is Required" });
+  if (!set_ids || !Array.isArray(set_ids) || set_ids.length === 0) {
+    return reply.status(400).send({ error: "At least one set is required" });
   }
 
-  const newWorkout = {
+  const result = await createWorkout({
     title,
     creator_id: user_id,
     user_id,
     date: new Date(),
     total_workout_volume,
-  };
+    set_ids,
+  });
 
-  const result = await createWorkout(newWorkout);
   return result;
 }
 
@@ -58,7 +51,7 @@ export async function deleteWorkoutService(
   title: string,
 ) {
   if (!title || title === "")
-    return reply.status(401).send({ error: "Workout title is required" });
+    return reply.status(400).send({ error: "Workout title is required" });
 
   const result = await deleteWorkout(user_id, title);
   if (!result) return reply.status(404).send({ error: "Workout not found" });

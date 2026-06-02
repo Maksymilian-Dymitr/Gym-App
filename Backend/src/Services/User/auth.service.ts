@@ -129,14 +129,4 @@ export class UserAuthService {
     return { user, email };
   }
 
-  static async generateTokens(id: string, role: string) {
-    return {
-      accessToken: "mock_access_token",
-      refreshToken: "mock_refresh_token"
-    };
-  }
-
-  static async refreshToken(userId: string, role: string) {
-    return this.generateTokens(userId, role);
-  }
 }

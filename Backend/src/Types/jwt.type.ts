@@ -1,5 +1,5 @@
 export type TokenPayLoad = {
-    user_id: string
+    id: string
     role: string
     type: string
 }
