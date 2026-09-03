@@ -36,10 +36,10 @@ export async function createWorkout(
 
 export async function deleteWorkout(
   user_id: string,
-  title: string,
+  id: string,
 ): Promise<boolean> {
   const result = await prisma.workout.deleteMany({
-    where: { creator_id: user_id, title },
+    where: { id, creator_id: user_id },
   });
 
   return result.count > 0;

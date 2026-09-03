@@ -1,38 +1,56 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { APITester } from "./APITester";
-import "./index.css";
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import ProtectedRoute from './components/auth/ProtectedRoute';
+import AdminRoute from './components/auth/AdminRoute';
+import PageShell from './components/layout/PageShell';
 
-import logo from "./logo.svg";
-import reactLogo from "./react.svg";
+import LandingPage from './pages/LandingPage';
+import LoginPage from './pages/LoginPage';
+import SignUpPage from './pages/SignUpPage';
+import LoginSuccessPage from './pages/LoginSuccessPage';
+import DashboardPage from './pages/DashboardPage';
+import ExerciseCatalogPage from './pages/ExerciseCatalogPage';
+import SetLoggerPage from './pages/SetLoggerPage';
+import WorkoutBuilderPage from './pages/WorkoutBuilderPage';
+import BodyWeightPage from './pages/BodyWeightPage';
+import WorkoutHistoryPage from './pages/WorkoutHistoryPage';
+import ProgressPage from './pages/ProgressPage';
+import ProfilePage from './pages/ProfilePage';
+import ExerciseDetailPage from './pages/ExerciseDetailPage';
+import AdminPage from './pages/admin/AdminPage';
 
 export function App() {
   return (
-    <div className="container mx-auto p-8 text-center relative z-10">
-      <div className="flex justify-center items-center gap-8 mb-8">
-        <img
-          src={logo}
-          alt="Bun Logo"
-          className="h-36 p-6 transition-all duration-300 hover:drop-shadow-[0_0_2em_#646cffaa] scale-120"
-        />
-        <img
-          src={reactLogo}
-          alt="React Logo"
-          className="h-36 p-6 transition-all duration-300 hover:drop-shadow-[0_0_2em_#61dafbaa] [animation:spin_20s_linear_infinite]"
-        />
-      </div>
-      <Card>
-        <CardHeader className="gap-4">
-          <CardTitle className="text-3xl font-bold">Bun + React</CardTitle>
-          <CardDescription>
-            Edit <code className="rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono">src/App.tsx</code> and save to
-            test HMR
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <APITester />
-        </CardContent>
-      </Card>
-    </div>
+    <BrowserRouter>
+      <AuthProvider>
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignUpPage />} />
+          <Route path="/login-success" element={<LoginSuccessPage />} />
+
+          <Route element={<ProtectedRoute />}>
+            <Route element={<PageShell />}>
+              <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/dashboard/exercises" element={<ExerciseCatalogPage />} />
+              <Route path="/dashboard/sets" element={<SetLoggerPage />} />
+              <Route path="/dashboard/workouts" element={<WorkoutBuilderPage />} />
+              <Route path="/dashboard/bodyweight" element={<BodyWeightPage />} />
+              <Route path="/history" element={<WorkoutHistoryPage />} />
+              <Route path="/progress" element={<ProgressPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/exercises/:name" element={<ExerciseDetailPage />} />
+            </Route>
+          </Route>
+
+          <Route element={<AdminRoute />}>
+            <Route element={<PageShell />}>
+              <Route path="/admin" element={<AdminPage />} />
+            </Route>
+          </Route>
+        </Routes>
+      </AuthProvider>
+    </BrowserRouter>
   );
 }
 

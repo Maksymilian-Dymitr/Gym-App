@@ -1,8 +1,8 @@
-FROM oven/bun
+FROM oven/bun:latest
 WORKDIR /app
-COPY package.json package-lock.json* bun.lockb* ./
-RUN bun install
+COPY package.json bun.lock ./
+RUN bun install --frozen-lockfile
 COPY . .
-RUN bun run build
 EXPOSE 3000
-CMD ["bun", "run", "dev"]
+ENV NODE_ENV=production
+CMD ["bun", "src/index.ts"]

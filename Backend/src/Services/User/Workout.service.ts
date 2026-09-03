@@ -11,11 +11,6 @@ export async function getAllWorkoutSerivce(
   user_id: string,
 ) {
   const result = await getAllWorkoutsByUserId(user_id);
-
-  if (result.length === 0) {
-    return reply.status(404).send({ error: "No workouts found" });
-  }
-
   return result;
 }
 
@@ -25,6 +20,7 @@ export async function createWorkoutService(
   title: string,
   set_ids: string[],
   total_workout_volume: number,
+  date?: Date,
 ) {
   if (!title || title.trim() === "") {
     return reply.status(400).send({ error: "Title is required" });
@@ -37,7 +33,7 @@ export async function createWorkoutService(
     title,
     creator_id: user_id,
     user_id,
-    date: new Date(),
+    date: date ?? new Date(),
     total_workout_volume,
     set_ids,
   });
@@ -48,12 +44,12 @@ export async function createWorkoutService(
 export async function deleteWorkoutService(
   reply: FastifyReply,
   user_id: string,
-  title: string,
+  id: string,
 ) {
-  if (!title || title === "")
-    return reply.status(400).send({ error: "Workout title is required" });
+  if (!id || id === "")
+    return reply.status(400).send({ error: "Workout id is required" });
 
-  const result = await deleteWorkout(user_id, title);
+  const result = await deleteWorkout(user_id, id);
   if (!result) return reply.status(404).send({ error: "Workout not found" });
 }
 

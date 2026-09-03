@@ -20,10 +20,11 @@ export async function createWorkout(
   request: FastifyRequest,
   reply: FastifyReply,
 ) {
-  const { title, set_ids, total_workout_volume } = request.body as {
+  const { title, set_ids, total_workout_volume, date } = request.body as {
     title: string;
     set_ids: string[];
     total_workout_volume: number;
+    date?: string;
   };
 
   const result = await workoutService.createWorkoutService(
@@ -32,6 +33,7 @@ export async function createWorkout(
     title,
     set_ids,
     total_workout_volume,
+    date ? new Date(date) : undefined,
   );
 
   if (reply.statusCode >= 400) {
@@ -47,15 +49,15 @@ export async function deleteWorkout(
   request: FastifyRequest,
   reply: FastifyReply,
 ) {
-  const { title } = request.params as { title: string };
+  const { id } = request.params as { id: string };
 
-  await workoutService.deleteWorkoutService(reply, (request.user as any).id, title);
+  await workoutService.deleteWorkoutService(reply, (request.user as any).id, id);
 
   if (reply.statusCode >= 400) {
     return;
   }
 
-  return reply.status(200).send({ message: "Workout deleted", title });
+  return reply.status(200).send({ message: "Workout deleted", id });
 }
 
 export async function updateWorkout(

@@ -21,11 +21,6 @@ export async function getExerciseService(
 
 export async function getAllExercisesService(reply: FastifyReply) {
   const result = await getAllExercises();
-
-  if (result.length === 0) {
-    return reply.status(404).send({ error: "No exercises found" });
-  }
-
   return result;
 }
 
@@ -77,11 +72,6 @@ export async function getSetService(
 
 export async function getAllSetsService(reply: FastifyReply, user_id: string) {
   const result = await getAllSets(user_id);
-
-  if (result.length === 0) {
-    return reply.status(404).send({ error: "No sets found" });
-  }
-
   return result;
 }
 

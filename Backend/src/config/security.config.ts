@@ -11,9 +11,12 @@ export async function setupSecure(app: FastifyInstance) {
   });
   await app.register(cors, {
     origin: [
-      "http://localhost:3001",
       "http://localhost:3000",
+      "http://localhost:3001",
       "http://localhost:3002",
     ],
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   });
 }

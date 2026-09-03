@@ -60,7 +60,7 @@ export class UserAuthService {
         code,
         client_id: clientId,
         client_secret: clientSecret,
-        redirect_uri: "http://localhost:3002/login/google/callback",
+        redirect_uri: "http://localhost:3001/login/google/callback",
         grant_type: "authorization_code",
       }),
     });

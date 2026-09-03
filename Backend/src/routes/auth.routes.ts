@@ -27,7 +27,7 @@ async function authRoutes(
       return reply.status(500).send({ error: "Google OAuth not configured properly" });
     }
     
-    const redirectUri = "http://localhost:3002/login/google/callback";
+    const redirectUri = "http://localhost:3001/login/google/callback";
     const scope = "profile email";
     
     const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +

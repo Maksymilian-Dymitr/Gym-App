@@ -7,7 +7,9 @@
     "@types/bun": "latest"
   },
   "scripts": {
-    "dev": "bun run src/index.ts"
+    "dev": "bun run src/index.ts",
+    "start": "bun run src/index.ts",
+    "seed": "bun run prisma/seed.ts"
   },
   "peerDependencies": {
     "typescript": "^5"

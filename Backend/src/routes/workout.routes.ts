@@ -14,7 +14,7 @@ async function workoutRoutes(
   server.get("/workout/:id", { preHandler: authenticate }, workoutCtrls.getWorkout);
   server.get("/workouts", { preHandler: authenticate }, workoutCtrls.getAllWorkouts);
   server.delete(
-    "/workouts/:title",
+    "/workouts/:id",
     { preHandler: authenticate },
     workoutCtrls.deleteWorkout,
   );
